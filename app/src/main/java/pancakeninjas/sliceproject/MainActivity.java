@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        chooseHostBtn = (Button)findViewById(R.id.chooseHostBtn);
+        chooseHostBtn = (Button)findViewById(R.id.prepareGameBtn);
         chooseHostBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
