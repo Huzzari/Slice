@@ -15,14 +15,19 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Play Game"
-        android:id="@+id/button"
-        android:onClick="onClick_Play" />
+        android:id="@+id/playGameBtn" />
 
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Connect to friend"
-        android:id="@+id/button2"
-        android:onClick="onClick_Connect" />
+        android:id="@+id/connectToFriendBtn" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose Host"
+        android:id="@+id/chooseHostBtn"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>
