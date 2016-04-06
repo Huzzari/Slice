@@ -26,8 +26,8 @@
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Choose Host"
-        android:id="@+id/chooseHostBtn"
+        android:text="Prepare Game"
+        android:id="@+id/prepareGameBtn"
         android:layout_gravity="center_horizontal" />
 
 </LinearLayout>
