@@ -1,7 +1,6 @@
 package pancakeninjas.sliceproject;
 
 import android.Manifest;
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -19,9 +18,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.security.Permission;
 import java.util.Set;
 
 public class ConnectActivity extends AppCompatActivity {
@@ -31,7 +27,7 @@ public class ConnectActivity extends AppCompatActivity {
     // HELLO WORLD!
 
     String deviceName, macAddress;
-    BluetoothAdapter bluetooth;
+    public BluetoothAdapter bluetooth;
     final int REQUEST_DISCOVERABLE = 12346;
     final int ENABLE_BLUETOOTH = 12345;
     TextView test1;
@@ -195,6 +191,8 @@ public class ConnectActivity extends AppCompatActivity {
             if(bluetooth.isDiscovering())
                 bluetooth.cancelDiscovery();
             Log.d("discover", "Started discovering.");
+            btArrayAdapter.clear();
+            btView.setAdapter(btArrayAdapter);
             bluetooth.startDiscovery();
             //IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
             //registerReceiver(deviceFoundRcvr, filter);
@@ -203,20 +201,27 @@ public class ConnectActivity extends AppCompatActivity {
 
     private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
-            btArrayAdapter.clear();
             Log.d("bluetoothReceiver", "Intent received");
             switch(intent.getAction()){
                 case BluetoothDevice.ACTION_FOUND:
-                    Log.d("bluetoothReceiver", "Device discovered.");
-                    //get device name
-                    String deviceName = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
-                    //get device
-                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    try{
+                        Log.d("bluetoothReceiver", "Device discovered.");
+                        //get device name
+                        String deviceName = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
+                        //get device
+                        BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                        if(device == null)
+                            Log.d("bluetoothReceier", "NULL DEVICE RECEIVED");
 
-                    // do whatever with the device
-                    btArrayAdapter.add(deviceName);
-                    test1.setText(deviceName);
-                    btView.setAdapter(btArrayAdapter);
+                        Log.d("bluetoothReceiver", deviceName);
+                        Log.d("bluetoothReceiver", device.toString());
+                        // do whatever with the device
+                        btArrayAdapter.add(deviceName);
+                        test1.setText(deviceName);
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
                     break;
                 case BluetoothAdapter.ACTION_DISCOVERY_FINISHED:
                     Log.d("bluetoothReceiver", "Finished discovering.");
