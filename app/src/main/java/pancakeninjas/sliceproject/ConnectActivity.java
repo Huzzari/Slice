@@ -24,7 +24,7 @@ import java.util.UUID;
 
 public class ConnectActivity extends AppCompatActivity {
 
-    private static final UUID SECURE_UUID = UUID.randomUUID();
+    private static final UUID SECURE_UUID = UUID.fromString("38df9e29-55e9-481b-8a4b-948714886462");
 
     public static final int  MY_PERMISSIONS_REQUEST_LOCATION = 3;
 
@@ -272,6 +272,7 @@ public class ConnectActivity extends AppCompatActivity {
 
         AcceptThread acceptThread = new AcceptThread(SECURE_UUID);
         acceptThread.start();
+
     }
 
     private AdapterView.OnItemClickListener discoverClick = new AdapterView.OnItemClickListener() {
@@ -279,6 +280,8 @@ public class ConnectActivity extends AppCompatActivity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             BluetoothDevice clickedDevice = btArrayAdapter.getItem(position);
             Log.d("DeviceClicked", "Device clicked: " + clickedDevice.getName());
+            ConnectThread connectThread = new ConnectThread(clickedDevice, SECURE_UUID);
+            connectThread.start();
         }
     };
 
