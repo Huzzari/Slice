@@ -28,6 +28,8 @@ public class ConnectActivity extends AppCompatActivity {
 
     public static final int  MY_PERMISSIONS_REQUEST_LOCATION = 3;
 
+    // HELLO WORLD!
+
     String deviceName, macAddress;
     BluetoothAdapter bluetooth;
     final int REQUEST_DISCOVERABLE = 12346;
