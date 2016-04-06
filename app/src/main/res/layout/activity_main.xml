@@ -23,11 +23,4 @@
         android:text="Connect to friend"
         android:id="@+id/connectToFriendBtn" />
 
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Prepare Game"
-        android:id="@+id/prepareGameBtn"
-        android:layout_gravity="center_horizontal" />
-
 </LinearLayout>

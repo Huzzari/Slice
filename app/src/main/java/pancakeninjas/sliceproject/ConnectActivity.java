@@ -15,12 +15,16 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import java.util.Set;
+import java.util.UUID;
 
 public class ConnectActivity extends AppCompatActivity {
+
+    private static final UUID SECURE_UUID = UUID.randomUUID();
 
     public static final int  MY_PERMISSIONS_REQUEST_LOCATION = 3;
 
@@ -31,7 +35,7 @@ public class ConnectActivity extends AppCompatActivity {
     final int REQUEST_DISCOVERABLE = 12346;
     final int ENABLE_BLUETOOTH = 12345;
     TextView test1;
-    ArrayAdapter<String> btArrayAdapter;
+    ArrayAdapter<BluetoothDevice> btArrayAdapter;
     ListView btView;
 
     @Override
@@ -41,25 +45,9 @@ public class ConnectActivity extends AppCompatActivity {
 
         if(Build.VERSION.SDK_INT < 23){
             Log.d("BuildVersion", "VERSION less than 23");
-            bluetooth = BluetoothAdapter.getDefaultAdapter();
-            if (bluetooth == null) {
-                // Device does not support Bluetooth
-                Log.d("onCreate", "Device does not support bluetooth");
-            }
 
-            btArrayAdapter = new ArrayAdapter<String>(this,
-                    android.R.layout.simple_list_item_1);
+            setup();
 
-
-            btView = (ListView) findViewById(R.id.listView);
-            test1 = (TextView) findViewById(R.id.textView2);
-
-            checkEnabled(test1);
-
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(BluetoothDevice.ACTION_FOUND);
-            filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-            this.registerReceiver(bluetoothReceiver, filter);
         }
         else{
             Log.d("BuildVersion", "VERSION 23");
@@ -90,25 +78,8 @@ public class ConnectActivity extends AppCompatActivity {
             else{
                 Log.d("DEBUG", "PERMISSION REQ  -> *** ACCESS_FINE/COARSE_LOCATION -> PERMISSION_GRANTED ****");
 
-                bluetooth = BluetoothAdapter.getDefaultAdapter();
-                if (bluetooth == null) {
-                    // Device does not support Bluetooth
-                    Log.d("onCreate", "Device does not support bluetooth");
-                }
+                setup();
 
-                btArrayAdapter = new ArrayAdapter<String>(this,
-                        android.R.layout.simple_list_item_1);
-
-
-                btView = (ListView) findViewById(R.id.listView);
-                test1 = (TextView) findViewById(R.id.textView2);
-
-                checkEnabled(test1);
-
-                IntentFilter filter = new IntentFilter();
-                filter.addAction(BluetoothDevice.ACTION_FOUND);
-                filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-                this.registerReceiver(bluetoothReceiver, filter);
             }
         }
     }
@@ -141,25 +112,7 @@ public class ConnectActivity extends AppCompatActivity {
                     // contacts-related task you need to do.
                     Log.d("DEBUG", "PERMISSION REQ  -> requestCode + ->*** ACCESS_FINE/CORSE_LOCATION -> PERMISSION_GRANTED ****");
 
-                    bluetooth = BluetoothAdapter.getDefaultAdapter();
-                    if (bluetooth == null) {
-                        // Device does not support Bluetooth
-                        Log.d("onCreate", "Device does not support bluetooth");
-                    }
-
-                    btArrayAdapter = new ArrayAdapter<String>(this,
-                            android.R.layout.simple_list_item_1);
-
-
-                    btView = (ListView) findViewById(R.id.listView);
-                    test1 = (TextView) findViewById(R.id.textView2);
-
-                    checkEnabled(test1);
-
-                    IntentFilter filter = new IntentFilter();
-                    filter.addAction(BluetoothDevice.ACTION_FOUND);
-                    filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-                    this.registerReceiver(bluetoothReceiver, filter);
+                    setup();
 
                 } else {
                     Log.d("DEBUG", "PERMISSION REQ  -> ACCESS DENIED");
@@ -193,6 +146,7 @@ public class ConnectActivity extends AppCompatActivity {
             Log.d("discover", "Started discovering.");
             btArrayAdapter.clear();
             btView.setAdapter(btArrayAdapter);
+            btView.setOnItemClickListener(discoverClick);
             bluetooth.startDiscovery();
             //IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
             //registerReceiver(deviceFoundRcvr, filter);
@@ -216,7 +170,7 @@ public class ConnectActivity extends AppCompatActivity {
                         Log.d("bluetoothReceiver", deviceName);
                         Log.d("bluetoothReceiver", device.toString());
                         // do whatever with the device
-                        btArrayAdapter.add(deviceName);
+                        btArrayAdapter.add(device);
                         test1.setText(deviceName);
                     }
                     catch (Exception e){
@@ -241,14 +195,15 @@ public class ConnectActivity extends AppCompatActivity {
         if (pairedDevices.size() > 0) {
             //ArrayAdapter<String> pairedArrayAdapter= new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
             btArrayAdapter.clear();
+            btView.setAdapter(btArrayAdapter);
+            btView.setOnItemClickListener(null);
             Log.d("pairedDevices", "3");
             // Loop through paired devices
             for (BluetoothDevice device : pairedDevices) {
                 // Add the name and address to an array adapter to show in a ListView
                 Log.d("pairedDevices", "before arrayAdapter");
-                btArrayAdapter.add(device.getName());
+                btArrayAdapter.add(device);
                 Log.d("pairedDevices", "after arrayAdapter");
-                btView.setAdapter(btArrayAdapter);
             }
         }
     }
@@ -296,4 +251,41 @@ public class ConnectActivity extends AppCompatActivity {
         super.onPause();
         unregisterReceiver(bluetoothReceiver);
     }
+
+    public void setup(){
+        bluetooth = BluetoothAdapter.getDefaultAdapter();
+        if (bluetooth == null) {
+            // Device does not support Bluetooth
+            Log.d("onCreate", "Device does not support bluetooth");
+        }
+
+        btArrayAdapter = new BTArrayAdapter(this, R.layout.btlist);
+        btView = (ListView) findViewById(R.id.listView);
+        test1 = (TextView) findViewById(R.id.textView2);
+
+        checkEnabled(test1);
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        this.registerReceiver(bluetoothReceiver, filter);
+
+        AcceptThread acceptThread = new AcceptThread(SECURE_UUID);
+        acceptThread.start();
+    }
+
+    private AdapterView.OnItemClickListener discoverClick = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            BluetoothDevice clickedDevice = btArrayAdapter.getItem(position);
+            Log.d("DeviceClicked", "Device clicked: " + clickedDevice.getName());
+        }
+    };
+
+    private AdapterView.OnItemClickListener pairedClick = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Log.d("PAIRED_CLICK", "Paired item was clicked.");
+        }
+    };
 }

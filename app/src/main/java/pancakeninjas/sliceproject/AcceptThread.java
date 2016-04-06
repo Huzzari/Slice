@@ -13,27 +13,28 @@ import java.util.UUID;
  */
 public class AcceptThread extends Thread {
     private final BluetoothServerSocket mmServerSocket;
-    private static final UUID SECURE_UUID = UUID.fromString("01010101-123124151-123151");
 
-
-    public AcceptThread() {
+    public AcceptThread(UUID uuid) {
         // Use a temporary object that is later assigned to mmServerSocket,
         // because mmServerSocket is final
         BluetoothServerSocket tmp = null;
         try {
             // MY_UUID is the app's UUID string, also used by the client code
-            tmp = BluetoothAdapter.getDefaultAdapter().listenUsingRfcommWithServiceRecord("Test1", SECURE_UUID);
+            tmp = BluetoothAdapter.getDefaultAdapter().listenUsingRfcommWithServiceRecord("Test1", uuid);
         } catch (IOException e) { }
         mmServerSocket = tmp;
     }
 
     public void run() {
+        Log.d("MSG", "Listening for connection.");
         BluetoothSocket socket = null;
         // Keep listening until exception occurs or a socket is returned
         while (true) {
+            Log.d("MSG", "Waiting for connection.");
             try {
                 socket = mmServerSocket.accept();
             } catch (IOException e) {
+                e.printStackTrace();
                 break;
             }
             // If a connection was accepted
