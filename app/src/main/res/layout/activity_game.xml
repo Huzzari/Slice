@@ -61,8 +61,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Y"
-        android:id="@+id/button8"
-        android:onClick="yellowCube"
+        android:id="@+id/yButton"
+        android:onClick="dropCube"
         android:layout_below="@+id/button10"
         android:layout_alignParentEnd="true"
         android:nestedScrollingEnabled="false" />
@@ -71,25 +71,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="B"
-        android:id="@+id/button9"
-        android:layout_below="@+id/button8"
-        android:layout_alignParentEnd="true" />
+        android:id="@+id/bButton"
+        android:layout_below="@+id/yButton"
+        android:layout_alignParentEnd="true"
+        android:onClick="dropCube" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="R"
-        android:id="@+id/button11"
-        android:layout_below="@+id/button9"
-        android:layout_alignParentEnd="true" />
+        android:id="@+id/rButton"
+        android:layout_below="@+id/bButton"
+        android:layout_alignParentEnd="true"
+        android:onClick="dropCube" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="G"
-        android:id="@+id/button12"
-        android:layout_below="@+id/button11"
-        android:layout_alignParentEnd="true" />
+        android:id="@+id/gButton"
+        android:layout_below="@+id/rButton"
+        android:layout_alignParentEnd="true"
+        android:onClick="dropCube" />
 
     <LinearLayout
         android:orientation="vertical"
@@ -116,8 +119,8 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="#73e60000"
+        android:layout_height="20dp"
+        android:background="#dcc70000"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/failField" />
@@ -157,7 +160,7 @@
         android:id="@+id/scoreLineBottom"
         android:layout_above="@+id/failField"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="30dp" />
+        android:layout_marginBottom="40dp" />
 
 
 </RelativeLayout>
