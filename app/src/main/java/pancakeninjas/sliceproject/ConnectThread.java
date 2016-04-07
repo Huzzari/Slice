@@ -8,9 +8,6 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.UUID;
 
-/**
- * Created by darkhobbo on 4/6/2016.
- */
 public class ConnectThread extends Thread {
     private final BluetoothSocket mmSocket;
     private final BluetoothDevice mmDevice;
@@ -59,7 +56,7 @@ public class ConnectThread extends Thread {
 
         // Do work to manage the connection (in a separate thread)
         Log.d("CONNECTION", "DEVICES ARE CONNECTED.");
-        //manageConnectedSocket(mmSocket);
+        manageConnectedSocket(mmSocket);
     }
 
     /** Will cancel an in-progress connection, and close the socket */
@@ -70,5 +67,12 @@ public class ConnectThread extends Thread {
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void manageConnectedSocket(BluetoothSocket bluetoothSocket){
+        Log.d("CONNECTION", "I AM SLAVE");
+        ConnectedThread connectedThread = new ConnectedThread(bluetoothSocket);
+        connectedThread.start();
+        connectedThread.write("First message".getBytes());
     }
 }

@@ -10,7 +10,9 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,14 +21,19 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+
 import java.util.Set;
 import java.util.UUID;
+import android.os.Handler;
+import android.widget.Toast;
 
 public class ConnectActivity extends AppCompatActivity {
 
     private static final UUID SECURE_UUID = UUID.fromString("38df9e29-55e9-481b-8a4b-948714886462");
-
     public static final int  MY_PERMISSIONS_REQUEST_LOCATION = 3;
+
+
 
     // HELLO WORLD!
 
@@ -37,14 +44,17 @@ public class ConnectActivity extends AppCompatActivity {
     TextView test1;
     ArrayAdapter<BluetoothDevice> btArrayAdapter;
     ListView btView;
+    private Context ctx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect);
+        ctx = this;
 
         if(Build.VERSION.SDK_INT < 23){
             Log.d("BuildVersion", "VERSION less than 23");
+
 
             setup();
 
