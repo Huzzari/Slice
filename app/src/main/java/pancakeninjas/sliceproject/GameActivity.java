@@ -11,25 +11,33 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameActivity extends AppCompatActivity {
 
-    int width, height, half;
-    int count = 1;
+    int width, height, half, playerScore;
+    int count = 0;
+    int count2 = 0;
     int speed = 2000;
+    int cap = 30;
+    int delay = 1000;
+    float endPoint;
     TranslateAnimation animation;
     ObjectAnimator anim;
-    ImageView cube1, cube2;
+    ImageView cube1;
+    Button blueButton, redButton, greenButton, yellowButton;
     ArrayList<ImageView> cubeArray;
     ArrayList<ImageView> deleteCubeArray;
     ImageView colour;
-    LinearLayout cubes, scoreZone, scoreTop, scoreBottom;
+    LinearLayout cubes, scoreZone, scoreTop, scoreBottom, divideBottom;
     TextView score;
     RelativeLayout mainLayout;
 
@@ -38,49 +46,39 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        cube1 = (ImageView) findViewById(R.id.bCube);
-        Log.d("Test", "Test1");
-        getScreenSize();
-
+        //arrayLists for storing cubes
         cubeArray = new ArrayList<ImageView>();
         deleteCubeArray = new ArrayList<ImageView>();
+        //copies of UI elements
+        cube1 = (ImageView) findViewById(R.id.bCube);
         cubes = (LinearLayout) findViewById(R.id.cubeLayout);
         mainLayout = (RelativeLayout) findViewById(R.id.mainRel);
         scoreZone = (LinearLayout) findViewById(R.id.scoreField);
         scoreTop = (LinearLayout) findViewById(R.id.scoreLineTop);
         scoreBottom = (LinearLayout) findViewById(R.id.scoreLineBottom);
+        divideBottom = (LinearLayout) findViewById(R.id.divider1);
         score = (TextView) findViewById(R.id.scoreText);
+        blueButton = (Button) findViewById(R.id.bButton);
+        redButton = (Button) findViewById(R.id.rButton);
+        yellowButton = (Button) findViewById(R.id.yButton);
+        greenButton = (Button) findViewById(R.id.gButton);
 
-        Log.d("Test", "Test2");
+        playerScore = 0;
+        endPoint = scoreBottom.getY();
+        Log.d("endPoint", "end Point = " + endPoint);
+        Log.d("endPoint", "end Point = " + scoreBottom.getY());
+        getScreenSize();
     }
 
-    public void moveCube2(View v){
 
-        Log.d("moveCube", "Test1");
-        int[] location = new int[2];
-        cube2.getLocationOnScreen(location);
-        Log.d("moveCube", "Test2");
-
-
-        Log.d("moveCube", "Test3");
-
-
-        Log.d("moveCube", "Test4");
-        animation.setDuration(speed);
-        animation.setFillAfter(false);
-
-        Log.d("moveCube", "Test5");
-        cube2.startAnimation(animation);
-        Log.d("moveCube", "Test6");
-
-
-    }
-
+    //used for when the user collects a cube before the animation has ended
     public void stopCube(){
-
+        //if the arrayList isnt empty
         if(!cubeArray.isEmpty()){
             ImageView temp = cubeArray.get(0);
+            //add cube to deleteCubeArray
             deleteCubeArray.add(temp);
+            //remove the cube from cubeArray and delete from the screen
             cubeArray.remove(0);
             mainLayout.removeView(temp);
         }
@@ -91,19 +89,19 @@ public class GameActivity extends AppCompatActivity {
         checkIfScore();
     }
 
+    //delete a cube that has ended its animation
     public void deleteCube(){
-
+        //check to make sure the arrayList isnt empty first
         if(!cubeArray.isEmpty()){
-
+            //remove from the arrayList and screen
             ImageView temp = cubeArray.get(0);
-            temp.clearAnimation();
             mainLayout.removeView(temp);
             cubeArray.remove(0);
             Log.d("deleteCube","not empty");
         }
     }
 
-
+    //gets the size of the screen
     public void getScreenSize(){
 
         width=0;
@@ -122,46 +120,114 @@ public class GameActivity extends AppCompatActivity {
     }
 
     public void checkIfScore(){
-
-        //int scoreTemp = Integer.parseInt(score.getText().toString());
+        //if there are cubes in cubeArray
         if(!cubeArray.isEmpty()) {
+            //copy the first cube
             ImageView temp = cubeArray.get(0);
 
             Log.d("Test","Cube = " + temp.getY());
             Log.d("Test", "Top = " + scoreTop.getY() + "Bottom = " + scoreBottom.getY());
 
+            //if the cube is in the score zone
             if ((temp.getY() > scoreTop.getY()) && (temp.getY() < scoreBottom.getY())) {
                 Log.d("CheckIfScore", "score!");
+                //remove cube from screen and place it into the deleteCubeArray
                 stopCube();
-                //scoreTemp++;
-                score.setText("SCORE");
+                //increase player score
+                playerScore += 10;
+                score.setText(""+playerScore);
                 Log.d("CheckIfScore", "score end");
-            } else {
+            } else {//cube is not in the score zone
                 Log.d("CheckIfScore", "oops, you missed!");
-                //scoreTemp--;
-                score.setText("MISS");
+                //decrease player score
+                playerScore-= 5;
+                score.setText(""+playerScore);
                 Log.d("CheckIfScore", "miss end");
             }
             Log.d("deleteCube", "not empty");
         }
     }
 
+    public void buttonDisable(){
+        blueButton.setEnabled(false);
+        redButton.setEnabled(false);
+        yellowButton.setEnabled(false);
+        greenButton.setEnabled(false);
+
+        Timer buttonTimer = new Timer();
+        buttonTimer.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        blueButton.setEnabled(true);
+                        redButton.setEnabled(true);
+                        yellowButton.setEnabled(true);
+                        greenButton.setEnabled(true);
+                    }
+                });
+            }
+        }, delay);
+    }
 
 
-    public void yellowCube(View v){
+    //makes a cube fall
+    //TODO: change View v to the message being passed
+    public void dropCube(View v){
+
+        buttonDisable();
         count++;
         Log.d("moveCube", "count = " + count);
-        int[] location = new int[2];
-        cube1.getLocationOnScreen(location);
+        //int[] location = new int[2];
+        //cube1.getLocationOnScreen(location);
         Log.d("moveCube", "Test2");
+        ImageView newCube;
 
-        ImageView newCube = new ImageView(this);
-        newCube.setImageResource(R.drawable.brick48yellow);
-
-        colour = (ImageView) findViewById(R.id.yCube);
+        switch(v.getId()){
+            //yellowButton pressed
+            case R.id.yButton:
+                //create new imageView for the cube
+                newCube = new ImageView(this);
+                newCube.setImageResource(R.drawable.brick48yellow);
+                //color is a copy of the yellow cube that stays on screen (yCube)
+                colour = (ImageView) findViewById(R.id.yCube);
+                break;
+            case R.id.bButton:
+                //create new imageView for the cube
+                newCube = new ImageView(this);
+                newCube.setImageResource(R.drawable.brick48blue);
+                //color is a copy of the yellow cube that stays on screen (yCube)
+                colour = (ImageView) findViewById(R.id.bCube);
+                break;
+            case R.id.gButton:
+                //create new imageView for the cube
+                newCube = new ImageView(this);
+                newCube.setImageResource(R.drawable.brick48green);
+                //color is a copy of the yellow cube that stays on screen (yCube)
+                colour = (ImageView) findViewById(R.id.gCube);
+                break;
+            case R.id.rButton:
+                //create new imageView for the cube
+                newCube = new ImageView(this);
+                newCube.setImageResource(R.drawable.brick48red);
+                //color is a copy of the yellow cube that stays on screen (yCube)
+                colour = (ImageView) findViewById(R.id.rCube);
+                break;
+            default:
+                newCube = new ImageView(this);
+                newCube.setImageResource(R.drawable.brick48yellow);
+                //color is a copy of the yellow cube that stays on screen (yCube)
+                colour = (ImageView) findViewById(R.id.yCube);
+                break;
+        }
+        //set X and Y of cube
         newCube.setX(colour.getX() + cubes.getX());
         newCube.setY(0);
         //newCube.setId(count);
+        //add the cube to the arraylist and add to the screen
         cubeArray.add(newCube);
         mainLayout.addView(newCube);
 
@@ -169,34 +235,45 @@ public class GameActivity extends AppCompatActivity {
 
         //LinearInterpolator linInt = new LinearInterpolator();
 
-        anim = ObjectAnimator.ofFloat(newCube, "Y", 0, height).setDuration(2000);
+        //animator for the cube
+        anim = ObjectAnimator.ofFloat(newCube, "Y", 0, scoreBottom.getY()).setDuration(2000);
+        //animator listener
         anim.addListener(new Animator.AnimatorListener() {
 
             @Override
             public void onAnimationStart(Animator animation) {
-                // TODO Auto-generated method stub
 
             }
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-                // TODO Auto-generated method stub
 
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                // TODO Auto-generated method stub
+                //if the cube has been scored (in the deleteCube arraylist)
                 if(!deleteCubeArray.isEmpty()){
+
                     ImageView temp = deleteCubeArray.get(0);
                     mainLayout.removeView(temp);
                     deleteCubeArray.remove(0);
                     Log.d("animationEnd","delete from deleteCubeArray");
                 }
-                else {
+                else {//if the cube reached the red zone
+                    //decrease player score
+                    playerScore-= 5;
+                    score.setText(""+playerScore);
+                    //delete the cube
                     deleteCube();
                 }
                 Log.d("animationListener","Animation End");
+                count2++;
+
+                if(count2 >= cap){
+                    //end of game
+                    //TODO: end of game
+                }
             }
 
             @Override
@@ -210,9 +287,10 @@ public class GameActivity extends AppCompatActivity {
         Log.d("moveCube", "Test5");
         anim.start();
         Log.d("moveCube", "Test6");
-    }
+    }//end of yellowCube
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //old version of the cube fall for safety
     public void greenCubeOld(View v){
         count++;
         Log.d("moveCube", "count = " + count);
@@ -243,7 +321,7 @@ public class GameActivity extends AppCompatActivity {
 
         colour = (ImageView) findViewById(R.id.gCube);
 
-        newCube.setX(colour.getX()+cubes.getX());
+        //newCube.setX(colour.getX()+cubes.getX());
         newCube.setY(0);
         // newCube.setId(count);
         cubeArray.add(newCube);
