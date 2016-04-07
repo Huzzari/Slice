@@ -1,6 +1,9 @@
 package pancakeninjas.sliceproject;
 
 import android.Manifest;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
@@ -16,6 +19,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -88,8 +92,10 @@ public class ConnectActivity extends AppCompatActivity {
     ArrayAdapter<BluetoothDevice> btArrayAdapter;
     ListView btView;
     private Context ctx;
+    private boolean manageFragmentShown = false;
+    private boolean playFragmentShown = false;
 
-    private ConnectedThread connectedThread;
+    protected ConnectedThread connectedThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,7 +161,6 @@ public class ConnectActivity extends AppCompatActivity {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     Log.d("DEBUG", "PERMISSION REQ  -> requestCode + ->*** ACCESS_FINE/CORSE_LOCATION -> PERMISSION_GRANTED ****");
-
                     setup();
 
                 } else {
@@ -176,8 +181,7 @@ public class ConnectActivity extends AppCompatActivity {
     }
 
     public void becomeDiscoverable(View v){
-        Intent discoverable = new
-                Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        Intent discoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverable.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 120);
         startActivityForResult(discoverable, REQUEST_DISCOVERABLE);
     }
@@ -196,8 +200,30 @@ public class ConnectActivity extends AppCompatActivity {
         }
     }
 
+    public void manageBtn(View v){
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        if (manageFragmentShown) {
+            Fragment thisFrag = fm.findFragmentByTag("manageFragment");
+            ft.detach(thisFrag);
+            manageFragmentShown = false;
+        } else {
+            FragConnectActivity frg = new FragConnectActivity();
+            ft.add(R.id.fragmentContainer, frg, "manageFragment");
+            manageFragmentShown = true;
+        }
+        ft.commit();
+    }
+
+    public void gameBtn(){
+
+    }
+
     public void sendMsg(View v){
-        connectedThread.write("First message".getBytes());
+        if(connectedThread != null)
+            connectedThread.write("First message".getBytes());
+        else
+            Log.d("SendMsg", "Not connected.");
     }
 
     private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
@@ -261,8 +287,7 @@ public class ConnectActivity extends AppCompatActivity {
 
         if (requestCode == ENABLE_BLUETOOTH) {
             if (resultCode == RESULT_OK) {
-                BluetoothAdapter bluetooth =
-                        BluetoothAdapter.getDefaultAdapter();
+                BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter();
                 String deviceName = bluetooth.getName();
                 String macAddress = bluetooth.getAddress();
                 // do something bluetoothy 
@@ -295,8 +320,13 @@ public class ConnectActivity extends AppCompatActivity {
     }
 
     public void onPause(){
-        super.onPause();
         unregisterReceiver(bluetoothReceiver);
+        if(connectedThread!=null)
+        {
+            connectedThread.cancel();
+            connectedThread = null;
+        }
+        super.onPause();
     }
 
     public void setup(){
@@ -307,8 +337,6 @@ public class ConnectActivity extends AppCompatActivity {
         }
 
         btArrayAdapter = new BTArrayAdapter(this, R.layout.btlist);
-        btView = (ListView) findViewById(R.id.listView);
-        test1 = (TextView) findViewById(R.id.textView2);
 
         checkEnabled(test1);
 
@@ -377,7 +405,11 @@ public class ConnectActivity extends AppCompatActivity {
                     handler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
                 }
                 catch (IOException e) {
-                    e.printStackTrace();
+                    Log.d("ConnectedThread", "Socket closed.");
+                    //e.printStackTrace();
+                    if(connectedThread!=null)
+                        connectedThread.cancel();
+
                     break;
                 }
             }
@@ -389,7 +421,8 @@ public class ConnectActivity extends AppCompatActivity {
                 mmOutStream.write(bytes);
             }
             catch (IOException e) {
-                e.printStackTrace();
+                Log.d("ConnectedThread", "Not connected.");
+                //e.printStackTrace();
             }
         }
 
@@ -441,12 +474,11 @@ public class ConnectActivity extends AppCompatActivity {
 
             } catch (IOException connectException) {
                 // Unable to connect; close the socket and get out
-                try {
-                    mmSocket.close();
-                }
-                catch (IOException closeException) {
-                    closeException.printStackTrace();
-                }
+                Log.d("ConnectThread", "Unable to connect.");
+                connectException.printStackTrace();
+                if(connectedThread!=null)
+                    connectedThread.cancel();
+
                 return;
             }
 
