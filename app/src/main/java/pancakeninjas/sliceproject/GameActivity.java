@@ -24,11 +24,10 @@ import java.util.TimerTask;
 public class GameActivity extends AppCompatActivity {
 
     int width, height, half, playerScore;
-    int count = 0;
-    int count2 = 0;
+    int count, count2;
     int speed = 2000;
     int cap = 30;
-    int delay = 1000;
+    int delay = 250;
     float endPoint;
     TranslateAnimation animation;
     ObjectAnimator anim;
@@ -63,6 +62,8 @@ public class GameActivity extends AppCompatActivity {
         yellowButton = (Button) findViewById(R.id.yButton);
         greenButton = (Button) findViewById(R.id.gButton);
 
+        count = 0;
+        count2 = 0;
         playerScore = 0;
         endPoint = scoreBottom.getY();
         Log.d("endPoint", "end Point = " + endPoint);
@@ -226,6 +227,16 @@ public class GameActivity extends AppCompatActivity {
         //set X and Y of cube
         newCube.setX(colour.getX() + cubes.getX());
         newCube.setY(0);
+
+        //set on click listener
+        newCube.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                //do stuff
+                Log.d("OnClickTest","onClick WORKING!!");
+                checkIfScore();
+            }
+        });
+
         //newCube.setId(count);
         //add the cube to the arraylist and add to the screen
         cubeArray.add(newCube);
