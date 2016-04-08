@@ -19,7 +19,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -28,8 +27,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,6 +47,7 @@ public class ConnectActivity extends AppCompatActivity {
                     byte[] readBuf = (byte[]) message.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, message.arg1);
+                    // RIGHT HERE.
                     Log.d("MESSAGE", readMessage);
                     break;
                 /*
@@ -207,7 +205,16 @@ public class ConnectActivity extends AppCompatActivity {
             Fragment thisFrag = fm.findFragmentByTag("manageFragment");
             ft.detach(thisFrag);
             manageFragmentShown = false;
-        } else {
+        }
+        else if (playFragmentShown){
+            Fragment thisFrag = fm.findFragmentByTag("playFragment");
+            ft.detach(thisFrag);
+            playFragmentShown = false;
+            FragConnectActivity frg = new FragConnectActivity();
+            ft.add(R.id.fragmentContainer, frg, "manageFragment");
+            manageFragmentShown = true;
+        }
+        else {
             FragConnectActivity frg = new FragConnectActivity();
             ft.add(R.id.fragmentContainer, frg, "manageFragment");
             manageFragmentShown = true;
@@ -215,8 +222,29 @@ public class ConnectActivity extends AppCompatActivity {
         ft.commit();
     }
 
-    public void gameBtn(){
-
+    public void gameBtn(View v){
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        if (playFragmentShown) {
+            Fragment thisFrag = fm.findFragmentByTag("playFragment");
+            ft.detach(thisFrag);
+            playFragmentShown = false;
+        }
+        else if (manageFragmentShown){
+            Fragment thisFrag = fm.findFragmentByTag("manageFragment");
+            ft.detach(thisFrag);
+            manageFragmentShown = false;
+            FragGamePlayerActivity frg = new FragGamePlayerActivity();
+            ft.add(R.id.fragmentContainer, frg, "playFragment");
+            playFragmentShown = true;
+        }
+        else
+            {
+            FragGamePlayerActivity frg = new FragGamePlayerActivity();
+            ft.add(R.id.fragmentContainer, frg, "playFragment");
+            playFragmentShown = true;
+        }
+        ft.commit();
     }
 
     public void sendMsg(View v){

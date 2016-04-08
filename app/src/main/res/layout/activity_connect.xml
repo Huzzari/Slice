@@ -22,7 +22,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/plyBtn"
-            android:id="@+id/playGameBtn" />
+            android:id="@+id/playGameBtn"
+            android:onClick="gameBtn"/>
     </LinearLayout>
 
     <LinearLayout
