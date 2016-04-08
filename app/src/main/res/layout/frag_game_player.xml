@@ -11,7 +11,6 @@
         android:layout_height="wrap_content"
         android:text="Swipe"
         android:id="@+id/button10"
-        android:onClick="testClick"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true" />
 
@@ -105,7 +104,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="125dp"
+        android:layout_height="70dp"
         android:background="#733ae600"
         android:id="@+id/scoreField"
         android:layout_above="@+id/divider1"
@@ -117,7 +116,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="40dp"
         android:background="#dcc70000"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
@@ -129,7 +128,7 @@
         android:layout_height="2dp"
         android:background="#000000"
         android:id="@+id/divider1"
-        android:layout_above="@+id/failField"
+        android:layout_above="@+id/halfField"
         android:layout_alignParentStart="true"/>
 
     <LinearLayout
@@ -156,9 +155,38 @@
         android:layout_height="1dp"
         android:background="#fb00ff"
         android:id="@+id/scoreLineBottom"
-        android:layout_above="@+id/failField"
+        android:layout_above="@+id/divider1"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="40dp" />
+        android:layout_marginBottom="22dp" />
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="#73E6CF00"
+        android:layout_above="@+id/divider2"
+        android:layout_alignParentStart="true"
+        android:id="@+id/halfField">
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#000000"
+        android:id="@+id/divider2"
+        android:layout_above="@+id/failField"
+        android:layout_centerHorizontal="true" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#fb00ff"
+        android:id="@+id/halfBottom"
+        android:layout_marginBottom="22dp"
+        android:layout_above="@+id/divider2"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

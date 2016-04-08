@@ -265,6 +265,16 @@ public class FragGamePlayerActivity extends Fragment{
         Log.d("dropCube", newCube.toString());
         newCube.setX(colour.getX() + cubes.getX());
         newCube.setY(0);
+
+        //set on click listener
+        newCube.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //do stuff
+                Log.d("OnClickTest", "onClick WORKING!!");
+                checkIfScore();
+            }
+        });
+
         //newCube.setId(count);
         //add the cube to the arraylist and add to the screen
         cubeArray.add(newCube);
