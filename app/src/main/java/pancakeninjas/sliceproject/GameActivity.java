@@ -27,7 +27,7 @@ public class GameActivity extends AppCompatActivity {
     int count, count2;
     int speed = 2000;
     int cap = 30;
-    int delay = 250;
+    int delay = 400;
     float endPoint;
     TranslateAnimation animation;
     ObjectAnimator anim;
@@ -36,7 +36,7 @@ public class GameActivity extends AppCompatActivity {
     ArrayList<ImageView> cubeArray;
     ArrayList<ImageView> deleteCubeArray;
     ImageView colour;
-    LinearLayout cubes, scoreZone, scoreTop, scoreBottom, divideBottom;
+    LinearLayout cubes, scoreZone, scoreTop, scoreBottom, divideBottom, halfBottom;
     TextView score;
     RelativeLayout mainLayout;
 
@@ -56,6 +56,7 @@ public class GameActivity extends AppCompatActivity {
         scoreTop = (LinearLayout) findViewById(R.id.scoreLineTop);
         scoreBottom = (LinearLayout) findViewById(R.id.scoreLineBottom);
         divideBottom = (LinearLayout) findViewById(R.id.divider1);
+        halfBottom = (LinearLayout) findViewById(R.id.halfBottom);
         score = (TextView) findViewById(R.id.scoreText);
         blueButton = (Button) findViewById(R.id.bButton);
         redButton = (Button) findViewById(R.id.rButton);
@@ -126,26 +127,32 @@ public class GameActivity extends AppCompatActivity {
             //copy the first cube
             ImageView temp = cubeArray.get(0);
 
-            Log.d("Test","Cube = " + temp.getY());
-            Log.d("Test", "Top = " + scoreTop.getY() + "Bottom = " + scoreBottom.getY());
+            //Log.d("Test","Cube = " + temp.getY());
+            //Log.d("Test", "Top = " + scoreTop.getY() + "Bottom = " + scoreBottom.getY());
 
             //if the cube is in the score zone
             if ((temp.getY() > scoreTop.getY()) && (temp.getY() < scoreBottom.getY())) {
-                Log.d("CheckIfScore", "score!");
+                Log.d("CheckIfScore", "Full score!");
                 //remove cube from screen and place it into the deleteCubeArray
                 stopCube();
                 //increase player score
                 playerScore += 10;
                 score.setText(""+playerScore);
-                Log.d("CheckIfScore", "score end");
-            } else {//cube is not in the score zone
+            }
+            else if((temp.getY() > scoreBottom.getY()) && (temp.getY() < halfBottom.getY())){
+                Log.d("CheckIfScore", "Half score!");
+                //remove cube from screen and place it into the deleteCubeArray
+                stopCube();
+                //increase player score
+                playerScore += 5;
+                score.setText(""+playerScore);
+            }
+            else{//cube is not in the score zone
                 Log.d("CheckIfScore", "oops, you missed!");
                 //decrease player score
                 playerScore-= 5;
                 score.setText(""+playerScore);
-                Log.d("CheckIfScore", "miss end");
             }
-            Log.d("deleteCube", "not empty");
         }
     }
 
@@ -184,7 +191,6 @@ public class GameActivity extends AppCompatActivity {
         Log.d("moveCube", "count = " + count);
         //int[] location = new int[2];
         //cube1.getLocationOnScreen(location);
-        Log.d("moveCube", "Test2");
         ImageView newCube;
 
         switch(v.getId()){
@@ -242,12 +248,10 @@ public class GameActivity extends AppCompatActivity {
         cubeArray.add(newCube);
         mainLayout.addView(newCube);
 
-        Log.d("moveCube", "Test3");
-
         //LinearInterpolator linInt = new LinearInterpolator();
 
         //animator for the cube
-        anim = ObjectAnimator.ofFloat(newCube, "Y", 0, scoreBottom.getY()).setDuration(2000);
+        anim = ObjectAnimator.ofFloat(newCube, "Y", 0, halfBottom.getY()).setDuration(speed);
         //animator listener
         anim.addListener(new Animator.AnimatorListener() {
 
@@ -293,11 +297,7 @@ public class GameActivity extends AppCompatActivity {
                 Log.d("animationListener","animation cancel");
             }
         });
-
-
-        Log.d("moveCube", "Test5");
         anim.start();
-        Log.d("moveCube", "Test6");
     }//end of yellowCube
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
