@@ -3,17 +3,17 @@ package pancakeninjas.sliceproject;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.app.Fragment;
+import android.content.Context;
 import android.graphics.Point;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.Image;
-import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -28,14 +28,25 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.LogRecord;
 
 /**
- * Created by darkhobbo on 4/7/2016.
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link FragGameBossActivity.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link FragGameBossActivity#newInstance} factory method to
+ * create an instance of this fragment.
  */
-public class FragGamePlayerActivity extends Fragment{
+public class FragGameBossActivity extends Fragment {
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
 
-    private ConnectActivity connectActivity;
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+    public ConnectActivity connectActivity;
     int width, height, half, playerScore;
     int count, count2;
     float endPoint;
@@ -46,19 +57,53 @@ public class FragGamePlayerActivity extends Fragment{
     ArrayList<ImageView> cubeArray;
     ArrayList<ImageView> deleteCubeArray;
     ImageView colour;
-    LinearLayout cubes, scoreZone, scoreZone2, scoreTop, scoreBottom, divideBottom, halfBottom;
+    LinearLayout cubes, scoreZone, scoreTop, scoreBottom, divideBottom, halfBottom;
     TextView score, endScore, endText;
     RelativeLayout mainLayout;
     ImageView yCube, bCube, rCube, gCube, explosionView;
-    private View view;
-    int countEnd=0;
     AnimationDrawable explode;
-    MediaPlayer mp;
+
+
+    private OnFragmentInteractionListener mListener;
+
+    public FragGameBossActivity() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment FragGameBossActivity.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static FragGameBossActivity newInstance(String param1, String param2) {
+        FragGameBossActivity fragment = new FragGameBossActivity();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        view = inflater.inflate(R.layout.frag_game_player, container, false);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_frag_game_boss, container, false);
         Log.d("onCreateView", "TEST");
+
         connectActivity = (ConnectActivity)getActivity();
 
         //arrayLists for storing cubes
@@ -73,20 +118,48 @@ public class FragGamePlayerActivity extends Fragment{
         scoreBottom = (LinearLayout) view.findViewById(R.id.scoreLineBottom);
         divideBottom = (LinearLayout) view.findViewById(R.id.divider1);
         halfBottom = (LinearLayout) view.findViewById(R.id.halfBottom);
-
         score = (TextView) view.findViewById(R.id.scoreText);
-        endText = (TextView) view.findViewById(R.id.endRoundText);
-        endScore = (TextView) view.findViewById(R.id.endScoretext);
-
+        blueButton = (Button) view.findViewById(R.id.bButton);
+        redButton = (Button) view.findViewById(R.id.rButton);
+        yellowButton = (Button) view.findViewById(R.id.yButton);
+        greenButton = (Button) view.findViewById(R.id.gButton);
         yCube = (ImageView)view.findViewById(R.id.yCube);
         gCube = (ImageView)view.findViewById(R.id.gCube);
         bCube = (ImageView)view.findViewById(R.id.bCube);
         rCube = (ImageView)view.findViewById(R.id.rCube);
+        endText = (TextView)view.findViewById(R.id.endRoundText);
         explosionView = (ImageView) view.findViewById(R.id.explosionView);
 
-        mp = MediaPlayer.create(view.getContext(), R.raw.gamemusic);
-        mp.setLooping(true);
-        //mp.start();
+
+        blueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dropCube(v);
+            }
+        });
+
+        redButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dropCube(v);
+            }
+        });
+
+        yellowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("yellowClick", v.toString());
+                dropCube(v);
+            }
+        });
+
+        greenButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dropCube(v);
+            }
+        });
+
         count=0;
         count2=0;
         playerScore = 0;
@@ -96,10 +169,6 @@ public class FragGamePlayerActivity extends Fragment{
         getScreenSize();
 
         return view;
-    }
-
-    public void setListeners(){
-
 
     }
 
@@ -130,54 +199,39 @@ public class FragGamePlayerActivity extends Fragment{
                     explode.start();
 
                 }
-            }, 0);
+            }, 200);
             Log.d("Explosion", "after animation");
             explode.stop();
             Log.d("Explosion", "after stop()");
+
         } catch (Exception e) {
             // TODO: handle exception
         }
 
     }
 
-
     //used for when the user collects a cube before the animation has ended
-    public void stopCube(View v){
+    public void stopCube(){
         //if the arrayList isnt empty
         if(!cubeArray.isEmpty()){
-            //connectActivity.sendStopCube();
-            ImageView temp = (ImageView) v;
+            ImageView temp = cubeArray.get(0);
             //add cube to deleteCubeArray
             deleteCubeArray.add(temp);
-            //set up explosion position
-            explosionView.setX(temp.getX());
-            explosionView.setY(temp.getY());
             //remove the cube from cubeArray and delete from the screen
+            cubeArray.remove(0);
             mainLayout.removeView(temp);
-            //play explosion
-            explosion();
         }
-    }
-
-    public void gameEnd(){
-        endText.setVisibility(View.VISIBLE);
-        endScore.setText("Score: " + playerScore);
-        endScore.setVisibility(View.VISIBLE);
-
     }
 
     //delete a cube that has ended its animation
     public void deleteCube(){
         //check to make sure the arrayList isnt empty first
         if(!cubeArray.isEmpty()){
-            //connectActivity.sendDeleteCube();
             //remove from the arrayList and screen
             ImageView temp = cubeArray.get(0);
             mainLayout.removeView(temp);
             cubeArray.remove(0);
             Log.d("deleteCube","not empty");
-
-
         }
     }
 
@@ -199,42 +253,7 @@ public class FragGamePlayerActivity extends Fragment{
 
     }
 
-    public void checkIfScore(View v){
-        //if there are cubes in cubeArray
-        if(!cubeArray.isEmpty()) {
-            //copy the first cube
-            ImageView temp = (ImageView) v;
-
-            //Log.d("Test","Cube = " + temp.getY());
-            //Log.d("Test", "Top = " + scoreTop.getY() + "Bottom = " + scoreBottom.getY());
-
-            //if the cube is in the score zone
-            if ((temp.getY() > scoreTop.getY()) && (temp.getY() < scoreBottom.getY())) {
-                Log.d("CheckIfScore", "Full score!");
-                //remove cube from screen and place it into the deleteCubeArray
-                stopCube(v);
-                //increase player score
-                playerScore += 10;
-                score.setText("Score: " + playerScore);
-            }
-            else if((temp.getY() > scoreBottom.getY()) && (temp.getY() < halfBottom.getY())){
-                Log.d("CheckIfScore", "Half score!");
-                //remove cube from screen and place it into the deleteCubeArray
-                stopCube(v);
-                //increase player score
-                playerScore += 5;
-                score.setText("Score: "+playerScore);
-            }
-            else{//cube is not in the score zone
-                Log.d("CheckIfScore", "oops, you missed!");
-                //decrease player score
-                playerScore-= 5;
-                score.setText("Score: "+playerScore);
-            }
-        }
-    }
-
-    /*public void buttonDisable(){
+    public void buttonDisable(){
         blueButton.setEnabled(false);
         redButton.setEnabled(false);
         yellowButton.setEnabled(false);
@@ -257,81 +276,77 @@ public class FragGamePlayerActivity extends Fragment{
                 });
             }
         }, Constants.delay);
-    }*/
+    }
 
 
     //makes a cube fall
     //TODO: change View v to the message being passed
-    public void dropCube(String cube){
+    public void dropCube(View v){
 
-        //buttonDisable();
         count++;
+        if(count< Constants.cap)
+        {
+            buttonDisable();
+        }
+        else{
+            blueButton.setEnabled(false);
+            redButton.setEnabled(false);
+            yellowButton.setEnabled(false);
+            greenButton.setEnabled(false);
+            endText.setVisibility(View.VISIBLE);
+        }
+
         Log.d("moveCube", "count = " + count);
         //int[] location = new int[2];
         //cube1.getLocationOnScreen(location);
         Log.d("moveCube", "Test2");
         ImageView newCube;
-        switch(cube){
-            case "yellow":
+        switch(v.getId()){
+            case R.id.yButton:
                 //create new imageView for the cube
-                newCube = new ImageView(view.getContext());
+                newCube = new ImageView(v.getContext());
                 newCube.setImageResource(R.drawable.brick48yellow);
                 //color is a copy of the yellow cube that stays on screen (yCube)
                 colour = yCube;
                 Log.d("dropCube", colour.toString());
+                connectActivity.sendYellow();
                 break;
-            case "blue":
+            case R.id.bButton:
                 //create new imageView for the cube
-                newCube = new ImageView(view.getContext());
+                newCube = new ImageView(v.getContext());
                 newCube.setImageResource(R.drawable.brick48blue);
                 //color is a copy of the yellow cube that stays on screen (yCube)
                 colour = bCube;
+                connectActivity.sendBlue();
                 break;
-            case "green":
+            case R.id.gButton:
                 //create new imageView for the cube
-                newCube = new ImageView(view.getContext());
+                newCube = new ImageView(v.getContext());
                 newCube.setImageResource(R.drawable.brick48green);
                 //color is a copy of the yellow cube that stays on screen (yCube)
                 colour = gCube;
+                connectActivity.sendGreen();
                 break;
-            case "red":
+            case R.id.rButton:
                 //create new imageView for the cube
-                newCube = new ImageView(view.getContext());
+                newCube = new ImageView(v.getContext());
                 newCube.setImageResource(R.drawable.brick48red);
                 //color is a copy of the yellow cube that stays on screen (yCube)
                 colour = rCube;
+                connectActivity.sendRed();
                 break;
             default:
-                newCube = new ImageView(view.getContext());
+                newCube = new ImageView(v.getContext());
                 newCube.setImageResource(R.drawable.brick48yellow);
                 //color is a copy of the yellow cube that stays on screen (yCube)
                 colour = yCube;
+                connectActivity.sendYellow();
                 break;
         }
         //set X and Y of cube
         Log.d("dropCube", newCube.toString());
         newCube.setX(colour.getX() + cubes.getX());
         newCube.setY(0);
-
-        //set on click listener
-        newCube.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.d("OnTouchTest", "onTouch WORKING!!");
-                checkIfScore(v);
-                return false;
-            }
-        });
-
-        /*
-        newCube.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //do stuff
-                Log.d("OnClickTest", "onClick WORKING!!");
-                checkIfScore();
-            }
-        });
-        */
 
         //newCube.setId(count);
         //add the cube to the arraylist and add to the screen
@@ -344,7 +359,6 @@ public class FragGamePlayerActivity extends Fragment{
 
         //animator for the cube
         anim = ObjectAnimator.ofFloat(newCube, "Y", 0, halfBottom.getY()).setDuration(Constants.speed);
-        Log.d("dropCube","anim interpolator = " + anim.getInterpolator());
         anim.setInterpolator(new LinearInterpolator());
         //animator listener
         anim.addListener(new Animator.AnimatorListener() {
@@ -362,62 +376,30 @@ public class FragGamePlayerActivity extends Fragment{
             @Override
             public void onAnimationEnd(Animator animation) {
                 //if the cube has been scored (in the deleteCube arraylist)
-                /*
-                if (!deleteCubeArray.isEmpty()) {
+                if(!deleteCubeArray.isEmpty()){
 
                     ImageView temp = deleteCubeArray.get(0);
                     mainLayout.removeView(temp);
                     deleteCubeArray.remove(0);
-                    Log.d("animationEnd", "delete from deleteCubeArray");
-                } else {//if the cube reached the red zone
-                    //decrease player score
-                    playerScore -= 5;
-                    score.setText("" + playerScore);
-                    //delete the cube
-                    deleteCube();
-
+                    Log.d("animationEnd","delete from deleteCubeArray");
                 }
-                */
-                //if we have caught a cube previous to animation ending
-                if(!deleteCubeArray.isEmpty()){
-
-                    ImageView temp = cubeArray.get(0);
-                    //if the animation belongs to a caught cube
-                    if(deleteCubeArray.contains(temp)){
-                        //remove cube from arrayLists (cube has already been scored)
-                        cubeArray.remove(temp);
-                        deleteCubeArray.remove(temp);
-                    }
-                    else{//the animation belongs to a cube that reached the end
-                        //remove from screen
-                        mainLayout.removeView(temp);
-                        playerScore-=5;
-                        score.setText("Score: " + playerScore);
-                        cubeArray.remove(0);
-                    }
-                }
-                else{//no cubes previously caught and cube reached bottom
-                    //decrease player score
-                    playerScore -= 5;
-                    score.setText("" + playerScore);
+                else {//if the cube reached the red zone
                     //delete the cube
                     deleteCube();
                 }
+                Log.d("animationListener","Animation End");
+                count2++;
 
-                Log.d("animationListener", "Animation End");
-                countEnd++;
-
-                if (countEnd >= Constants.cap) {
+                if(count2 >= Constants.cap){
                     //end of game
                     //TODO: end of game
-                    gameEnd();
                 }
             }
 
             @Override
             public void onAnimationCancel(Animator animation) {
                 // TODO Auto-generated method stub
-                Log.d("animationListener", "animation cancel");
+                Log.d("animationListener","animation cancel");
             }
         });
 
@@ -461,7 +443,7 @@ public class FragGamePlayerActivity extends Fragment{
 
         //newCube.setX(colour.getX()+cubes.getX());
         newCube.setY(0);
-        newCube.setId(count);
+        // newCube.setId(count);
         cubeArray.add(newCube);
         mainLayout.addView(newCube);
 
@@ -476,12 +458,18 @@ public class FragGamePlayerActivity extends Fragment{
         Log.d("moveCube", "Test6");
     }
 
-
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        //TODO fix the music stop
-        //mp.stop();
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
     }
 }

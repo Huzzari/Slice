@@ -4,17 +4,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.pancakeninjas.slice.MainActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:gravity="center_vertical|center_horizontal"
+    android:background="#00ffffff">
 
-    <TextView
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:id="@+id/imageView9"
+        android:background="@drawable/slicemain" />
 
-    <Button
-        android:layout_width="fill_parent"
+    <ImageButton
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Connect to friend"
-        android:id="@+id/connectToFriendBtn" />
+        android:id="@+id/connectToFriendBtn"
+        android:src="@drawable/connect_button"
+        android:background="#00ffffff"
+        android:layout_marginTop="60dp" />
 
 </LinearLayout>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SliceProject</string>
+    <string name="app_name">Slice</string>
     <string name="plyBtn">Play</string>
     <string name="mngBtn">Manage</string>
     <string name="pairedDevBtn">list Paired Devices</string>
@@ -7,5 +7,15 @@
     <string name="enableBTBtn">enable bluetooth</string>
     <string name="discDevBtn">discover devices</string>
     <string name="sendMsgBtn">Send Msg</string>
-    <string name="testTxtView">Hi there</string>
+    <string name="testTxtView"></string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="howToPlay0">\tThe player scores points by tapping the falling \nblocks sent by the boss.
+                            </string>
+    <string name="howToPlay1">Blocks tapped in the green field give higher points.</string>
+        <string name="howToPlay2">Blocks tapped in the red field decrease your points.</string>
+
+    <string name="howToBoss">\tThe boss sends blocks to the player by \n
+                            tapping on the blocks at the top of the screen.</string>
 </resources>

@@ -30,6 +30,7 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -49,6 +50,7 @@ public class ConnectActivity extends AppCompatActivity {
                     String readMessage = new String(readBuf, 0, message.arg1);
                     // RIGHT HERE.
                     Log.d("MESSAGE", readMessage);
+                    processMessage(readMessage);
                     break;
                 /*
                 case Constants.MESSAGE_STATE_CHANGE:
@@ -81,6 +83,7 @@ public class ConnectActivity extends AppCompatActivity {
     };
 
     // HELLO WORLD!
+    //HI!
 
     String deviceName, macAddress;
     public BluetoothAdapter bluetooth;
@@ -90,8 +93,12 @@ public class ConnectActivity extends AppCompatActivity {
     ArrayAdapter<BluetoothDevice> btArrayAdapter;
     ListView btView;
     private Context ctx;
-    private boolean manageFragmentShown = false;
-    private boolean playFragmentShown = false;
+    private FragGamePlayerActivity fragGamePlayerActivity;
+    private FragGameBossActivity fragGameBossActivity;
+    private boolean master = false;
+    private boolean imboss = false;
+    protected boolean ready = false;
+    protected boolean enemyReady = false;
 
     protected ConnectedThread connectedThread;
 
@@ -135,13 +142,36 @@ public class ConnectActivity extends AppCompatActivity {
         }
     }
 
+    public void setup(){
+        bluetooth = BluetoothAdapter.getDefaultAdapter();
+        if (bluetooth == null) {
+            // Device does not support Bluetooth
+            Log.d("onCreate", "Device does not support bluetooth");
+        }
+        else
+            checkEnabled(test1);
+    }
+
+    public void postSetup(){
+        btArrayAdapter = new BTArrayAdapter(this, R.layout.btlist);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        this.registerReceiver(bluetoothReceiver, filter);
+
+        AcceptThread acceptThread = new AcceptThread(SECURE_UUID);
+        acceptThread.start();
+        manageStart();
+    }
+
     public void checkEnabled(View v){
         if (bluetooth.isEnabled()) {
             deviceName = bluetooth.getName();
             macAddress = bluetooth.getAddress();
+            postSetup();
+
         } else {
-            Intent enableBluetooth =
-                    new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBluetooth, ENABLE_BLUETOOTH);
         }
     }//end of checkEnabled
@@ -182,6 +212,7 @@ public class ConnectActivity extends AppCompatActivity {
         Intent discoverable = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverable.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 120);
         startActivityForResult(discoverable, REQUEST_DISCOVERABLE);
+        test1.setText("Friends should be able to find me now.");
     }
 
     public void discover(View v){
@@ -189,6 +220,7 @@ public class ConnectActivity extends AppCompatActivity {
             if(bluetooth.isDiscovering())
                 bluetooth.cancelDiscovery();
             Log.d("discover", "Started discovering.");
+            test1.setText("Looking for friends...");
             btArrayAdapter.clear();
             btView.setAdapter(btArrayAdapter);
             btView.setOnItemClickListener(discoverClick);
@@ -198,52 +230,11 @@ public class ConnectActivity extends AppCompatActivity {
         }
     }
 
-    public void manageBtn(View v){
+    public void manageStart(){
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        if (manageFragmentShown) {
-            Fragment thisFrag = fm.findFragmentByTag("manageFragment");
-            ft.detach(thisFrag);
-            manageFragmentShown = false;
-        }
-        else if (playFragmentShown){
-            Fragment thisFrag = fm.findFragmentByTag("playFragment");
-            ft.detach(thisFrag);
-            playFragmentShown = false;
-            FragConnectActivity frg = new FragConnectActivity();
-            ft.add(R.id.fragmentContainer, frg, "manageFragment");
-            manageFragmentShown = true;
-        }
-        else {
-            FragConnectActivity frg = new FragConnectActivity();
-            ft.add(R.id.fragmentContainer, frg, "manageFragment");
-            manageFragmentShown = true;
-        }
-        ft.commit();
-    }
-
-    public void gameBtn(View v){
-        FragmentManager fm = getFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        if (playFragmentShown) {
-            Fragment thisFrag = fm.findFragmentByTag("playFragment");
-            ft.detach(thisFrag);
-            playFragmentShown = false;
-        }
-        else if (manageFragmentShown){
-            Fragment thisFrag = fm.findFragmentByTag("manageFragment");
-            ft.detach(thisFrag);
-            manageFragmentShown = false;
-            FragGamePlayerActivity frg = new FragGamePlayerActivity();
-            ft.add(R.id.fragmentContainer, frg, "playFragment");
-            playFragmentShown = true;
-        }
-        else
-            {
-            FragGamePlayerActivity frg = new FragGamePlayerActivity();
-            ft.add(R.id.fragmentContainer, frg, "playFragment");
-            playFragmentShown = true;
-        }
+        FragConnectActivity frg = new FragConnectActivity();
+        ft.add(R.id.fragmentContainer, frg, "manageFragment");
         ft.commit();
     }
 
@@ -272,7 +263,7 @@ public class ConnectActivity extends AppCompatActivity {
                         Log.d("bluetoothReceiver", device.toString());
                         // do whatever with the device
                         btArrayAdapter.add(device);
-                        test1.setText(deviceName);
+                        test1.setText("Found Device! Click on a device to start a game.");
                     }
                     catch (Exception e){
                         e.printStackTrace();
@@ -320,6 +311,7 @@ public class ConnectActivity extends AppCompatActivity {
                 String macAddress = bluetooth.getAddress();
                 // do something bluetoothy 
                 Log.d("onActivityResult","bluetooth enabled");
+                postSetup();
             }
             else{
                 Log.d("onActivityResult","bluetooth cancelled");
@@ -355,27 +347,6 @@ public class ConnectActivity extends AppCompatActivity {
             connectedThread = null;
         }
         super.onPause();
-    }
-
-    public void setup(){
-        bluetooth = BluetoothAdapter.getDefaultAdapter();
-        if (bluetooth == null) {
-            // Device does not support Bluetooth
-            Log.d("onCreate", "Device does not support bluetooth");
-        }
-
-        btArrayAdapter = new BTArrayAdapter(this, R.layout.btlist);
-
-        checkEnabled(test1);
-
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(BluetoothDevice.ACTION_FOUND);
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        this.registerReceiver(bluetoothReceiver, filter);
-
-        AcceptThread acceptThread = new AcceptThread(SECURE_UUID);
-        acceptThread.start();
-
     }
 
     private AdapterView.OnItemClickListener discoverClick = new AdapterView.OnItemClickListener() {
@@ -435,9 +406,12 @@ public class ConnectActivity extends AppCompatActivity {
                 catch (IOException e) {
                     Log.d("ConnectedThread", "Socket closed.");
                     //e.printStackTrace();
-                    if(connectedThread!=null)
+                    master = false;
+                    if(connectedThread!=null){
                         connectedThread.cancel();
-
+                        connectedThread = null;
+                    }
+                    finish();
                     break;
                 }
             }
@@ -458,6 +432,7 @@ public class ConnectActivity extends AppCompatActivity {
         public void cancel() {
             try {
                 mmSocket.close();
+                master = false;
             }
             catch (IOException e) {
                 e.printStackTrace();
@@ -584,8 +559,235 @@ public class ConnectActivity extends AppCompatActivity {
 
         public void manageConnectedSocket(BluetoothSocket bluetoothSocket){
             Log.d("CONNECTION", "I AM MASTER");
+            master = true;
             connectedThread = new ConnectedThread(bluetoothSocket);
             connectedThread.start();
+            setupGame();
+        }
+    }
+
+    public void gameStart(){
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+
+        FragHowToPlay fragHowToPlay = new FragHowToPlay();
+        ft.replace(R.id.fragmentContainer, fragHowToPlay, "howToPlayFrag");
+
+        ft.commit();
+    }
+
+    public void bossStart() {
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+
+        FragHowToBoss fragHowToBoss = new FragHowToBoss();
+        ft.replace(R.id.fragmentContainer, fragHowToBoss, "howToBossFrag");
+
+        ft.commit();
+    }
+
+    public void setupGame(){
+        // I am master, I am setting up game.
+        requestRoll();
+    }
+
+    public void startGame(){
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        if(imboss){
+            Log.d("startGame", "If Setting frags");
+            FragGameBossActivity frg = new FragGameBossActivity();
+            ft.replace(R.id.fragmentContainer, frg, "bossFragment");
+            fragGameBossActivity = frg;
+        }
+        else
+        {
+            Log.d("startGame", "Else Setting frags");
+            FragGamePlayerActivity frg = new FragGamePlayerActivity();
+            ft.replace(R.id.fragmentContainer, frg, "playFragment");
+            fragGamePlayerActivity = frg;
+        }
+        Log.d("startGame", "Before commit");
+        try{
+            ft.commit();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        Log.d("startGame", "After commit");
+    }
+
+    public void requestRoll(){
+        connectedThread.write("req,roll".getBytes());
+    }
+
+    public void sendRoll(){
+        connectedThread.write(("res,rollnum," + new Random().nextInt(100)).getBytes());
+    }
+
+    public void areYouReady(){
+        connectedThread.write("req,ready".getBytes());
+    }
+
+    public void sendReady(){
+        connectedThread.write("res,ready".getBytes());
+    }
+
+    public void sendDeleteCube(){
+        connectedThread.write("req,deletecube".getBytes());
+    }
+
+    public void sendStopCube(){
+        connectedThread.write("req,stopcube".getBytes());
+    }
+
+    public void sendBlue(){
+        connectedThread.write("req,blue".getBytes());
+    }
+
+    public void sendRed(){
+        connectedThread.write("req,red".getBytes());
+    }
+
+    public void sendYellow(){
+        connectedThread.write("req,yellow".getBytes());
+    }
+
+    public void sendGreen(){
+        connectedThread.write("req,green".getBytes());
+    }
+
+    public void sendCancel(){
+        connectedThread.write("req,cancel".getBytes());
+    }
+
+    public void killFrag(){
+        if(imboss){
+            FragmentManager fm = getFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.detach(fm.findFragmentByTag("howToBossFrag"));
+            ft.commit();
+        }
+        else{
+            FragmentManager fm = getFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.detach(fm.findFragmentByTag("howToPlayFrag"));
+            ft.commit();
+        }
+    }
+
+    public void compareRoll(int clientRoll){
+        Log.d("compareRoll", "Client Roll: " + clientRoll);
+        int myRoll = new Random().nextInt(100);
+        Log.d("compareRoll", "My Roll: " + myRoll);
+        if(myRoll >= clientRoll){
+            // I go first.
+            Log.d("compareRoll", "I go first.");
+            connectedThread.write("res,imboss".getBytes());
+            imboss = true;
+            bossStart();
+        }
+        else{
+            Log.d("compareRoll", "I go second");
+            connectedThread.write("res,implayer".getBytes());
+            // OPEN PLAYER FRAGMENT.
+            gameStart();
+        }
+    }
+
+    public void processMessage(String message){
+        String[] tokenized = message.split(",");
+        switch(tokenized[0]){
+            case "req":
+                switch (tokenized[1]){
+                    case "blue":
+                        // CALL SEND BLUE HERE.
+                        Log.d("processMessage", "Request for Blue Cube.");
+                        fragGamePlayerActivity.dropCube("blue");
+                        break;
+                    case "red":
+                        // CALL SEND RED HERE.
+                        Log.d("processMessage", "Request for Red Cube.");
+                        fragGamePlayerActivity.dropCube("red");
+                        break;
+                    case "green":
+                        // CALL SEND GREEN HERE.
+                        Log.d("processMessage", "Request for Green Cube.");
+                        fragGamePlayerActivity.dropCube("green");
+                        break;
+                    case "yellow":
+                        // CALL SEND YELLOW HERE.
+                        Log.d("processMessage", "Request for Yellow Cube.");
+                        fragGamePlayerActivity.dropCube("yellow");
+                        break;
+                    case "roll":
+                        // CALL SEND ROLL HERE.
+                        Log.d("processMessage", "Request for Roll.");
+                        sendRoll();
+                        break;
+                    case "state":
+                        // CALL SEND STATE HERE.
+                        Log.d("processMessage", "Request for State.");
+                        break;
+                    case "youhost":
+                        // BECOME HOST HERE.
+                        Log.d("processMessage", "Request to become host");
+                        break;
+                    case "deletecube":
+                        Log.d("processMessage", "Request to delete cube");
+                        fragGameBossActivity.deleteCube();
+                        break;
+                    case "stopcube":
+                        Log.d("processMessage", "Request to stop cube");
+                        fragGameBossActivity.stopCube();
+                        break;
+                    case "ready":
+                        Log.d("processMessage", "Request if ready");
+                        enemyReady = true;
+                        break;
+                    default:
+                        Log.d("processMessage", "req Broken");
+                        Log.d("processMessage", message);
+                }
+                break;
+            case "res":
+                switch (tokenized[1]){
+                    case "rollnum":
+                        // CALL ROLL NUMBER HERE.
+                        Log.d("processMessage", "Received roll");
+                        compareRoll(Integer.parseInt(tokenized[2]));
+                        break;
+                    case "ready":
+                        Log.d("processMessage", "Received ready state");
+                        startGame();
+                        break;
+                    case "gamestart":
+                        Log.d("processMessage", "Received game start");
+                        break;
+                    case "cancel":
+                        Log.d("processMessage", "Received cancel response");
+                        killFrag();
+                        finish();
+                        break;
+                    case "gamefinished":
+                        Log.d("processMessage", "Received game finished.");
+                        break;
+                    case "imboss":
+                        Log.d("processMessage", "Received imboss response, therefore I am player.");
+                        gameStart();
+                        break;
+                    case "implayer":
+                        Log.d("processMessage", "Received implayer response, therefore I am boss.");
+                        imboss = true;
+                        bossStart();
+                        break;
+                    default:
+                        Log.d("processMessage", "res Broken");
+                }
+                break;
+            default:
+                Log.d("processMessage", "How did we get here?");
+                Log.d("processMessage", "Message: " + message);
         }
     }
 }

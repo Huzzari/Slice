@@ -1,11 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    tools:context="com.pancakeninjas.slice.FragGamePlayerActivity"
-    android:id="@+id/mainRel"
-    android:visibility="visible">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FragGameBossActivity"
+    android:id="@+id/mainRel">
 
     <LinearLayout
         android:orientation="horizontal"
@@ -16,40 +14,36 @@
         android:id="@+id/cubeLayout">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="91dp"
+            android:layout_height="91dp"
             android:id="@+id/yCube"
             android:src="@drawable/brick48yellow"
             android:layout_below="@+id/bCube"
-            android:layout_toStartOf="@+id/rCube"
-            android:visibility="invisible" />
+            android:layout_toStartOf="@+id/rCube" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="91dp"
+            android:layout_height="91dp"
             android:id="@+id/bCube"
             android:src="@drawable/brick48blue"
             android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/button7"
-            android:visibility="invisible" />
+            android:layout_toEndOf="@+id/button7" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="91dp"
+            android:layout_height="91dp"
             android:id="@+id/rCube"
             android:src="@drawable/brick48red"
             android:layout_above="@+id/yCube"
-            android:layout_alignParentEnd="true"
-            android:visibility="invisible" />
+            android:layout_alignParentEnd="true" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="91dp"
+            android:layout_height="91dp"
             android:id="@+id/gCube"
             android:src="@drawable/brick48green"
             android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:visibility="invisible" />
+            android:layout_alignParentStart="true" />
 
     </LinearLayout>
 
@@ -110,7 +104,8 @@
         android:id="@+id/scoreText"
         android:textSize="30dp"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:visibility="invisible" />
 
     <LinearLayout
         android:orientation="vertical"
@@ -176,12 +171,51 @@
         android:layout_centerHorizontal="true"
         android:visibility="invisible" />
 
-    <ImageView
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/explosionView"
-        android:layout_above="@+id/endRoundText"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="84dp" />
+        android:id="@+id/buttonLayout">
+
+        <Button
+            android:layout_width="91dp"
+            android:layout_height="91dp"
+            android:id="@+id/yButton"
+            android:nestedScrollingEnabled="false"
+            android:layout_above="@+id/bButton"
+            android:layout_alignParentEnd="true"
+            android:visibility="visible"
+            android:background="#00ffffff" />
+
+        <Button
+            android:layout_width="91dp"
+            android:layout_height="91dp"
+            android:id="@+id/bButton"
+            android:layout_above="@+id/rButton"
+            android:layout_alignParentEnd="true"
+            android:visibility="visible"
+            android:background="#00ffffff" />
+
+        <Button
+            android:layout_width="91dp"
+            android:layout_height="91dp"
+            android:id="@+id/rButton"
+            android:onClick="dr"
+            android:layout_alignBottom="@+id/endScoretext"
+            android:layout_alignParentEnd="true"
+            android:visibility="visible"
+            android:background="#00ffffff" />
+
+        <Button
+            android:layout_width="91dp"
+            android:layout_height="91dp"
+            android:id="@+id/gButton"
+            android:layout_above="@+id/scoreLineTop"
+            android:layout_alignParentEnd="true"
+            android:visibility="visible"
+            android:background="#00ffffff" />
+
+    </LinearLayout>
 
 </RelativeLayout>

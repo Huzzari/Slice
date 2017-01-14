@@ -5,37 +5,32 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center">
 
-        <Button
-            android:layout_width="fill_parent"
+        <ImageButton
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/pairedDevBtn"
-            android:id="@+id/pairDevBtn"/>
+            android:id="@+id/pairDevBtn"
+            android:src="@drawable/pair_button"
+            android:background="#00ffffff"
+            android:layout_marginTop="5dp" />
 
-        <Button
-            android:layout_width="fill_parent"
+        <ImageButton
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/becomeDiscBtn"
-            android:id="@+id/becomeDiscoverableBtn"/>
+            android:id="@+id/becomeDiscoverableBtn"
+            android:src="@drawable/discoverable_button"
+            android:background="#00ffffff"
+            android:layout_marginTop="5dp" />
 
-        <Button
-            android:layout_width="fill_parent"
+        <ImageButton
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/enableBTBtn"
-            android:id="@+id/enableBluetoothBtn"/>
-
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/discDevBtn"
-            android:id="@+id/discoverDeviceBtn"/>
-
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/sendMsgBtn"
-            android:id="@+id/sendMessageBtn"/>
+            android:id="@+id/discoverDeviceBtn"
+            android:src="@drawable/discover_button"
+            android:background="#00ffffff"
+            android:layout_marginTop="5dp" />
 
         <TextView android:text="@string/testTxtView" android:layout_width="wrap_content"
             android:layout_height="wrap_content"
